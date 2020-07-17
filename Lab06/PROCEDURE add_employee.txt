@@ -1,0 +1,36 @@
+<----------------------------------------------------------------Question 3 c --------------------------------------------------------------------------------------------->
+CREATE OR REPLACE PROCEDURE DEL_JOB(p_id jobs.job_id%TYPE) IS
+BEGIN
+	DELETE FROM JOBS
+	WHERE job_id = p_id;
+	IF SQL%ROWCOUNT <= 0 THEN
+		RAISE_APPLICATION_ERROR(-20203, 'Nothing to DELETE.');
+	END IF;
+END DEL_JOB;
+/
+EXECUTE DEL_JOB('IT_DBA');
+SELECT * FROM JOBS WHERE job_id = 'IT_DBA';
+EXECUTE DEL_JOB('IT_WEB');
+
+<------------------------------------------------------------Practic Question 3 ------------------------------------------------------------------------------------------>
+CREATE OR REPLACE PROCEDURE add_employee(
+v_first_name    IN  employees.first_name%TYPE,
+v_last_name     IN  employees.last_name%TYPE,
+v_email         IN  employees.email%TYPE,
+v_job           IN  employees.job_id%TYPE :='SA_REP',
+v_mgr           IN  employees.manager_id%TYPE := 145,
+v_sal           IN  employees.salary%TYPE := 1000,
+v_comm          IN  employees.commission_pct%TYPE := 0,
+v_deptid        IN  employees.department_id%TYPE := 30) IS
+BEGIN
+    IF valid_deptid(v_deptid) THEN
+        INSERT INTO employees(employee_id, first_name, last_name, email, hire_date, job_id, manager_id, salary, commission_pct, department_id)
+        VALUES (employees_seq.NEXTVAL, v_first_name, v_last_name, v_email, TRUNC(SYSDATE), v_job, v_mgr, v_sal, v_comm, v_deptid);
+    ELSE    
+        RAISE_APPLICATION_ERROR(-20204, 'Invalid Department ID. Try again.');
+    END IF;    
+END add_employee;
+/
+EXECUTE add_employee('JANE', 'Harris', 'JAHARRIS', v_deptid => 15)
+EXECUTE add_employee('Joe', 'Harris', 'Jaharris', v_deptid => 80)
+SELECT * FROM employees WHERE last_name = 'Harris';
